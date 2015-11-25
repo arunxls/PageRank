@@ -143,6 +143,8 @@
   <ItemGroup>
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="FileWriter.h" />
+    <ClInclude Include="Graph.h" />
+    <ClInclude Include="GraphReader.h" />
     <ClInclude Include="include.h" />
     <ClInclude Include="print.h" />
     <ClInclude Include="stdafx.h" />
@@ -152,6 +154,8 @@
   <ItemGroup>
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="FileWriter.cpp" />
+    <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="GraphReader.cpp" />
     <ClCompile Include="PageRank.cpp" />
     <ClCompile Include="print.cpp" />
     <ClCompile Include="stdafx.cpp">
