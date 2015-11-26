@@ -4,9 +4,14 @@
 #include "stdafx.h"
 #include <chrono>
 #include "include.h"
-//#include <psapi.h>
+#include <psapi.h>
+#include "PiManager.h"
+#include "Graph.h"
 
 #define BUFFERSIZE 496
+#define GRAPH_READER 8
+#define TOTAL_NODES 86533762
+#define TOTAL_NODES_WITH_OUT_DEGREE 86533762
 
 //no except
 void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
@@ -29,6 +34,9 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
 
     std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
     {
+        PiManager pi(2, TOTAL_NODES_WITH_OUT_DEGREE);
+        Graph graph();
+        
         //printf("Total IO: read - %.2f GB; write - %.2f GB\n", (float)splitHash.total_read / _1_GB, (float)splitHash.total_write / _1_GB);
         //total_read += (float)splitHash.total_read;
         //total_write += (float)splitHash.total_write;
@@ -43,14 +51,14 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
         std::chrono::duration_cast<std::chrono::seconds>(e1 - b1).count(),
         (float)total_read / _1_GB, (float)total_write / _1_GB);
 
-    //{
-    //    PROCESS_MEMORY_COUNTERS pp;
-    //    HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
-    //        PROCESS_VM_READ,
-    //        FALSE, GetCurrentProcessId());
-    //    GetProcessMemoryInfo(hProcess, &pp, sizeof(PROCESS_MEMORY_COUNTERS));
-    //    printf("Peak working set : %.2f MB\n", (double)pp.PeakWorkingSetSize / _1_MB);
-    //}
+    {
+        PROCESS_MEMORY_COUNTERS pp;
+        HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION |
+            PROCESS_VM_READ,
+            FALSE, GetCurrentProcessId());
+        GetProcessMemoryInfo(hProcess, &pp, sizeof(PROCESS_MEMORY_COUNTERS));
+        printf("Peak working set : %.2f MB\n", (double)pp.PeakWorkingSetSize / _1_MB);
+    }
 
     printf("DONE!\n");
     return;

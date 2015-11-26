@@ -1,5 +1,7 @@
 #pragma once
 
+#include <windows.h>
+
 #define _1_MB 1000000
 #define _1_GB 1000000000
 #define DEBUG 1
@@ -16,14 +18,21 @@ public:
     uint32 hash;
     uint32 len;
 
-    bool operator==(const HeaderGraph& a) const
-    {
-        return hash == a.hash;
-    }
-
     uint32 size()
     {
         return sizeof(HeaderGraph) + (sizeof(uint32)*this->len);
+    }
+};
+
+class TruncatedHeaderGraph {
+public:
+    uint32 hash;
+    uint32 original_len;
+    uint32 current_len;
+
+    uint32 size()
+    {
+        return sizeof(TruncatedHeaderGraph) + (sizeof(uint32)*this->current_len);
     }
 };
 #pragma pack(pop)
