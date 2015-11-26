@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GraphReader.h"
 
-GraphReader::GraphReader(char* buffer_start, char* buffer_end, char * file_name)
+GraphReader::GraphReader(char * file_name, bool buffered)
 {
     this->total_read = 0;
     this->total_write = 0;
@@ -11,8 +11,8 @@ GraphReader::GraphReader(char* buffer_start, char* buffer_end, char * file_name)
 
     this->FR = new FileReader(file_name);
 
-    this->buffer_start = buffer_start;
-    this->buffer_end = buffer_end;
+    this->buffer_start = new char[GRAPH_READER_SIZE*_1_MB];
+    this->buffer_end = this->buffer_start + GRAPH_READER_SIZE*_1_MB;
 
     this->start = this->buffer_start;
     this->end = this->buffer_start;

@@ -17,7 +17,12 @@ PiManager::PiManager(uint32 ways, uint32 size)
     }
 }
 
-
 PiManager::~PiManager()
 {
+    for (int i = 0; i < this->ways; ++i)
+    {
+        delete[] *(this->way + i);
+    }
+
+    delete[] this->way;
 }

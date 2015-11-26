@@ -7,6 +7,11 @@
 #define DEBUG 1
 #define _HAS_ITERATOR_DEBUGGING 1
 
+#define BUFFERSIZE 496
+#define TOTAL_NODES 86533762
+#define TOTAL_NODES_WITH_OUT_DEGREE 86533762
+#define GRAPH_READER_SIZE 8
+
 typedef unsigned __int64 uint64;
 typedef unsigned __int32 uint32;
 typedef __int32 int32;

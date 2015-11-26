@@ -8,18 +8,13 @@
 #include "PiManager.h"
 #include "Graph.h"
 
-#define BUFFERSIZE 496
-#define GRAPH_READER 8
-#define TOTAL_NODES 86533762
-#define TOTAL_NODES_WITH_OUT_DEGREE 86533762
-
 //no except
 void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
 {
-    if (argc != 3)
+    if (argc != 2)
     {
         printf("Usage Error: Incorrect number of arguments\n\n");
-        _tprintf("Usage:\n\t%s <graph_file_name> <map_file_name>\n", argv[0]);
+        _tprintf("Usage:\n\t%s <graph_file_name>\n", argv[0]);
         return;
     }
 
@@ -35,6 +30,7 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
     std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
     {
         PiManager pi(2, TOTAL_NODES_WITH_OUT_DEGREE);
+        GraphReader reader(argv[1], false);
         Graph graph();
         
         //printf("Total IO: read - %.2f GB; write - %.2f GB\n", (float)splitHash.total_read / _1_GB, (float)splitHash.total_write / _1_GB);

@@ -18,7 +18,7 @@ public:
 
     FileReader* FR;
 
-    GraphReader(char* buffer_start, char* buffer_end, char * file_name);
+    GraphReader(char * file_name, bool buffered);
     GraphReader();
     ~GraphReader();
 
