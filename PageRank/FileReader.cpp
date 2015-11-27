@@ -92,7 +92,7 @@ void FileReader::getFileHandle()
             OPEN_EXISTING,         // existing file only
             FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, // normal file
             NULL);
-        if (DEBUG && hFile == INVALID_HANDLE_VALUE) {
+        if (hFile == INVALID_HANDLE_VALUE) {
             _tprintf("Terminal failure: unable to open file \"%s\" for read.\n", this->filename);
             std::abort();
         }

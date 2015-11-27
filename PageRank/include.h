@@ -4,13 +4,12 @@
 
 #define _1_MB 1000000
 #define _1_GB 1000000000
-#define DEBUG 1
-#define _HAS_ITERATOR_DEBUGGING 1
+#define DEBUG 0
 
 #define BUFFERSIZE 496
 #define TOTAL_NODES 86533762
-#define TOTAL_NODES_WITH_OUT_DEGREE 86533762
-#define GRAPH_READER_SIZE 8
+#define TOTAL_NODES_WITH_OUT_DEGREE 25943372
+#define GRAPH_READER_SIZE 32
 
 typedef unsigned __int64 uint64;
 typedef unsigned __int32 uint32;

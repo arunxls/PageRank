@@ -30,8 +30,11 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
     std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
     {
         PiManager pi(2, TOTAL_NODES_WITH_OUT_DEGREE);
-        GraphReader reader(argv[1], false);
-        Graph graph();
+        GraphReader reader;
+
+        reader.init(argv[1], false);
+        Graph graph(&reader, &pi);
+        char* truncated_graph = graph.execute_first();
         
         //printf("Total IO: read - %.2f GB; write - %.2f GB\n", (float)splitHash.total_read / _1_GB, (float)splitHash.total_write / _1_GB);
         //total_read += (float)splitHash.total_read;

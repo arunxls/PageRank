@@ -11,20 +11,16 @@ public:
     char* start;
     char* end;
 
-    uint32 out_degree;
-
     uint64 total_read;
     uint64 total_write;
 
     FileReader* FR;
 
-    GraphReader(char * file_name, bool buffered);
     GraphReader();
     ~GraphReader();
 
     bool has_next();
-    uint32 nextNode();
+    uint32 next_node(const HANDLE*, CONDITION_VARIABLE*, CRITICAL_SECTION*, GraphReader* graph);
     void load();
-private:
-    uint32 node_count;
+    void init(char* file_name, bool buffer);
 };
