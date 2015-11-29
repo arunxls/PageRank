@@ -10,6 +10,7 @@
 #define TOTAL_NODES 86533762
 #define TOTAL_NODES_WITH_OUT_DEGREE 25943372
 #define GRAPH_READER_SIZE 32
+#define GRAPH_WRITER_SIZE 256
 
 typedef unsigned __int64 uint64;
 typedef unsigned __int32 uint32;

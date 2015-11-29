@@ -21,6 +21,8 @@ public:
 
     bool has_next();
     uint32 next_node(const HANDLE*, CONDITION_VARIABLE*, CRITICAL_SECTION*, GraphReader* graph);
+    uint32 next_node();
     void load();
     void init(char* file_name, bool buffer);
+    void reset() { this->FR->offset_current_read = 0; this->FR->offset_overall = 0; }
 };

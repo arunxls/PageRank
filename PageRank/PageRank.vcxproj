@@ -151,6 +151,7 @@
     <ClInclude Include="FileWriter.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="GraphReader.h" />
+    <ClInclude Include="GraphWriter.h" />
     <ClInclude Include="include.h" />
     <ClInclude Include="PiManager.h" />
     <ClInclude Include="print.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="FileWriter.cpp" />
     <ClCompile Include="Graph.cpp" />
     <ClCompile Include="GraphReader.cpp" />
+    <ClCompile Include="GraphWriter.cpp" />
     <ClCompile Include="PageRank.cpp" />
     <ClCompile Include="PiManager.cpp" />
     <ClCompile Include="print.cpp" />

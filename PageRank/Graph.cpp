@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Graph.h"
-#include <algorithm>
+#include "GraphWriter.h"
+#include "utils.h"
+#include <utility>
 #include <ppl.h>
 
 Graph::Graph()
@@ -26,7 +28,7 @@ Graph::~Graph()
 {
 }
 
-DWORD WINAPI threadFirst(LPVOID data)
+DWORD WINAPI threadSecond(LPVOID data)
 {
     std::pair < std::pair<int, int>, Graph* > arg = *(std::pair < std::pair<int, int>, Graph* > *) data;
 
@@ -35,22 +37,20 @@ DWORD WINAPI threadFirst(LPVOID data)
     int lower = arg.first.first;
     int upper = arg.first.second;
 
-    float offset = 1.0 / TOTAL_NODES;
-
     while (1) 
     {
         uint32 currentHash = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
         //printf("%I32u\n", currentHash);
 
         uint32 currentLen = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
-        uint32 count = currentLen;
+        uint32 count = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
 
         while (--count != -1)
         {
             uint32 node = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
             if (node >= lower && node <= upper)
             {
-                pi->way[pi->current()][node] += (offset / currentLen);
+                pi->way[pi->current()][node] += (pi->way[pi->prev()][currentHash] / currentLen);
             }
         }
     }
@@ -59,56 +59,102 @@ DWORD WINAPI threadFirst(LPVOID data)
 char * Graph::execute_first()
 {
     this->pi->reset();
+    this->graph->reset();
+
     this->graph->load();
 
-    DWORD   dwThreadIdArray[THREADS];
+    GraphWriter writer(getNewOutputFile());
 
-    //Create args
-    uint32 offset = TOTAL_NODES_WITH_OUT_DEGREE / THREADS;
-    std::vector<std::pair < std::pair<int, int>, Graph* >> args = this->create_args(offset);
-
-    //Threads get started here!
-    for (int i = 0; i < THREADS; ++i) 
+    float offset = 1.0 / TOTAL_NODES;
+    while (this->graph->has_next())
     {
-        this->hThreadArray[i] = CreateThread(
-            NULL,                   // default security attributes
-            0,                      // use default stack size  
-            threadFirst,            // thread function name
-            &args[i],               // argument to thread function 
-            0,                      // use default creation flags 
-            &dwThreadIdArray[i]);   // returns the thread identifier 
+        uint32 currentHash = this->graph->next_node();
+        //printf("%I32u\n", currentHash);
 
+        uint32 currentLen = this->graph->next_node();
+        uint32 count = currentLen;
 
-        if (DEBUG && hThreadArray[i] == NULL)
+        writer.writeHeader(currentHash, currentLen);
+
+        while (--count != -1)
         {
-            //ErrorHandler(TEXT("CreateThread"));
-            ExitProcess(3);
+            uint32 node = this->graph->next_node();
+            if (node <= TOTAL_NODES_WITH_OUT_DEGREE)
+            {
+                writer.writeTruncated(node);
+                this->pi->way[this->pi->current()][node] += (offset / currentLen);
+            }
         }
     }
+    
+    writer.writeToDisk();
 
-    while (this->graph->FR->has_next())
-    {
-        for (int i = 0; i < THREADS; ++i)
-        {
-            WaitForSingleObject(gGraph_EMPTY, INFINITE);
-        }
-
-        this->graph->load();
-        WakeAllConditionVariable(&GRAPH_LOADED);
-    }
-
-    for (int i = 0; i < THREADS; ++i)
-    {
-        WaitForSingleObject(gGraph_EMPTY, INFINITE);
-    }
-
-    printf("DONE!\n");
-
-    return nullptr;
+    return writer.FW->filename;
 }
 
 void Graph::execute_iteration(uint32 num)
 {
+    for (uint32 i = 0; i < num; ++i)
+    {
+        //Re-init for each iteration.
+        this->pi->reset();
+        this->graph->reset();
+
+        //Run each iteration here
+
+        this->graph->load();
+        DWORD   dwThreadIdArray[THREADS];
+
+        //Create args
+        uint32 offset = TOTAL_NODES_WITH_OUT_DEGREE / THREADS;
+        std::vector<std::pair < std::pair<int, int>, Graph* >> args = this->create_args(offset);
+
+        //Threads get started here!
+        for (int i = 0; i < THREADS; ++i)
+        {
+            this->hThreadArray[i] = CreateThread(
+                NULL,                   // default security attributes
+                0,                      // use default stack size  
+                threadSecond,            // thread function name
+                &args[i],               // argument to thread function 
+                0,                      // use default creation flags 
+                &dwThreadIdArray[i]);   // returns the thread identifier 
+
+
+            if (DEBUG && hThreadArray[i] == NULL)
+            {
+                //ErrorHandler(TEXT("CreateThread"));
+                ExitProcess(3);
+            }
+        }
+
+        while (this->graph->FR->has_next())
+        {
+            for (int i = 0; i < THREADS; ++i)
+            {
+                WaitForSingleObject(gGraph_EMPTY, INFINITE);
+            }
+
+            this->graph->load();
+            WakeAllConditionVariable(&GRAPH_LOADED);
+        }
+
+        for (int i = 0; i < THREADS; ++i)
+        {
+            WaitForSingleObject(gGraph_EMPTY, INFINITE);
+        }
+        
+        printf("I32u iteration done!\n", i);
+        this->pi->invert();
+
+        //Close threads here
+        //Start threads again for new iteration
+        for (int i = 0; i < THREADS; ++i) {
+            CloseHandle(this->hThreadArray[i]);
+        }
+    }
+
+    printf("DONE!");
 }
 
 void Graph::execute_last()

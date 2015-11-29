@@ -40,6 +40,19 @@ uint32 GraphReader::next_node(const HANDLE* gGraph_EMPTY, CONDITION_VARIABLE* GR
     return currentHash;
 }
 
+uint32 GraphReader::next_node()
+{
+    if (this->start == this->end)
+    {
+        this->load();
+    }
+
+    uint32 currentHash = *(uint32*)this->start;
+    this->start += sizeof(uint32);
+
+    return currentHash;
+}
+
 void GraphReader::load()
 {
     uint32 bytesTransferred = 0;

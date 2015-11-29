@@ -35,6 +35,8 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
         reader.init(argv[1], false);
         Graph graph(&reader, &pi);
         char* truncated_graph = graph.execute_first();
+        reader.init(truncated_graph, true);
+        graph.execute_iteration(8);
         
         //printf("Total IO: read - %.2f GB; write - %.2f GB\n", (float)splitHash.total_read / _1_GB, (float)splitHash.total_write / _1_GB);
         //total_read += (float)splitHash.total_read;

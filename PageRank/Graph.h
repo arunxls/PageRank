@@ -5,7 +5,7 @@
 #include "include.h"
 #include <vector>
 
-#define THREADS 4
+#define THREADS 2
 
 static const HANDLE gGraph_EMPTY = CreateSemaphore(NULL, 0, THREADS, NULL);
 static const HANDLE gGraph_STARTED = CreateSemaphore(NULL, 0, THREADS, NULL);
