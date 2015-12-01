@@ -94,39 +94,40 @@ char * Graph::execute_first()
 
 void Graph::execute_iteration(uint32 num)
 {
+
+    //Create args
+    uint32 offset = TOTAL_NODES_WITH_OUT_DEGREE / THREADS;
+    std::vector<std::pair < std::pair<int, int>, Graph* >> args = this->create_args(offset);
+
+    //Threads get started here!
+    DWORD   dwThreadIdArray[THREADS];
+    for (int i = 0; i < THREADS; ++i)
+    {
+        this->hThreadArray[i] = CreateThread(
+            NULL,                   // default security attributes
+            0,                      // use default stack size  
+            threadSecond,            // thread function name
+            &args[i],               // argument to thread function 
+            0,                      // use default creation flags 
+            &dwThreadIdArray[i]);   // returns the thread identifier 
+
+
+        if (DEBUG && hThreadArray[i] == NULL)
+        {
+            //ErrorHandler(TEXT("CreateThread"));
+            ExitProcess(3);
+        }
+    }
+
     for (uint32 i = 0; i < num; ++i)
     {
         //Re-init for each iteration.
         this->pi->reset();
         this->graph->reset();
 
-        //Run each iteration here
-
+        //Start each iteration here
         this->graph->load();
-        DWORD   dwThreadIdArray[THREADS];
-
-        //Create args
-        uint32 offset = TOTAL_NODES_WITH_OUT_DEGREE / THREADS;
-        std::vector<std::pair < std::pair<int, int>, Graph* >> args = this->create_args(offset);
-
-        //Threads get started here!
-        for (int i = 0; i < THREADS; ++i)
-        {
-            this->hThreadArray[i] = CreateThread(
-                NULL,                   // default security attributes
-                0,                      // use default stack size  
-                threadSecond,            // thread function name
-                &args[i],               // argument to thread function 
-                0,                      // use default creation flags 
-                &dwThreadIdArray[i]);   // returns the thread identifier 
-
-
-            if (DEBUG && hThreadArray[i] == NULL)
-            {
-                //ErrorHandler(TEXT("CreateThread"));
-                ExitProcess(3);
-            }
-        }
+        WakeAllConditionVariable(&GRAPH_LOADED);
 
         while (this->graph->FR->has_next())
         {
@@ -144,14 +145,15 @@ void Graph::execute_iteration(uint32 num)
             WaitForSingleObject(gGraph_EMPTY, INFINITE);
         }
         
-        printf("I32u iteration done!\n", i);
+        printf("%I32u iteration done!\n", i);
         this->pi->invert();
 
-        //Close threads here
-        //Start threads again for new iteration
-        for (int i = 0; i < THREADS; ++i) {
-            CloseHandle(this->hThreadArray[i]);
-        }
+        
+    }
+
+    //Close threads here
+    for (int i = 0; i < THREADS; ++i) {
+        CloseHandle(this->hThreadArray[i]);
     }
 
     printf("DONE!");
