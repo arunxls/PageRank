@@ -63,9 +63,10 @@ char * Graph::execute_first()
 
     this->graph->load();
 
-    GraphWriter writer(getNewOutputFile());
+    //GraphWriter writer(getNewOutputFile());
 
     float offset = 1.0 / TOTAL_NODES;
+    
     while (this->graph->has_next())
     {
         uint32 currentHash = this->graph->next_node();
@@ -74,26 +75,42 @@ char * Graph::execute_first()
         uint32 currentLen = this->graph->next_node();
         uint32 count = currentLen;
 
-        writer.writeHeader(currentHash, currentLen);
+        //writer.writeHeader(currentHash, currentLen);
 
         while (--count != -1)
         {
             uint32 node = this->graph->next_node();
             if (node <= TOTAL_NODES_WITH_OUT_DEGREE)
             {
-                writer.writeTruncated(node);
+                //writer.writeTruncated(node);
                 this->pi->way[this->pi->current()][node] += (offset / currentLen);
             }
         }
     }
-    
-    writer.writeToDisk();
 
-    return writer.FW->filename;
+    double X = offset * TOTAL_NODES_WITH_OUT_DEGREE;
+    double Y = 1.0 - X;
+
+    X *= (1.0 - ALPHA) / (float) this->pi->size;
+    Y *= 1.0 / (float) this->pi->size;
+
+    for (int i = 0; i < this->pi->size; ++i)
+    {
+        this->pi->way[this->pi->current()][i] = (ALPHA * this->pi->way[this->pi->current()][i]) + X + Y;
+    }
+    
+    this->pi->print();
+    
+
+    //writer.writeToDisk();
+
+    //return writer.FW->filename;
+    return new char[1];
 }
 
 void Graph::execute_iteration(uint32 num)
 {
+    this->graph->reset();
 
     //Create args
     uint32 offset = TOTAL_NODES_WITH_OUT_DEGREE / THREADS;
@@ -147,8 +164,6 @@ void Graph::execute_iteration(uint32 num)
         
         printf("%I32u iteration done!\n", i);
         this->pi->invert();
-
-        
     }
 
     //Close threads here

@@ -28,3 +28,34 @@ PiManager::~PiManager()
 
     delete[] this->way;
 }
+
+void PiManager::print()
+{
+    double X = 0.0;
+    for (int i = 0; i < this->size; ++i)
+    {
+        X += this->way[this->current()][i];
+    }
+
+    printf("Current pi sum = %.3f\n", X);
+}
+
+void PiManager::normalize()
+{
+    double X = 0.0;
+    double Y = 1.0;
+    for (int i = 0; i < this->size; ++i)
+    {
+        X += this->way[this->current()][i];
+    }
+
+    Y = 1.0 - X;
+
+    X *= (1.0 - ALPHA) /(float) this->size;
+    Y *= 1.0 /(float) this->size;
+
+    for (int i = 0; i < this->size; ++i)
+    {
+        this->way[this->current()][i] = (ALPHA * this->way[this->current()][i]) + X + Y;
+    }
+}

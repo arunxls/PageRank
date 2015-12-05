@@ -19,5 +19,7 @@ public:
 
     void invert() { this->state ^= 1; }
     void reset() { memset(this->way[this->current()], 0.0, sizeof(float) * this->size); }
+    void print();
+    void normalize();
 };
 
