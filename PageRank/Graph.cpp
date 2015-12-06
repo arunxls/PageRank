@@ -127,7 +127,22 @@ void Graph::execute_iteration(uint32 num)
 
     //Create args
     uint32 offset = TOTAL_NODES_WITH_OUT / THREADS;
-    std::vector<std::pair < std::pair<int, int>, Graph* >> args = this->create_args(offset);
+    std::vector<std::pair < std::pair<int, int>, Graph* >> args;
+    {
+        std::pair<int, int> bounds(0, offset);
+        args.push_back(std::make_pair(bounds, this));
+    }
+
+    for (int i = 1; i < THREADS - 1; ++i)
+    {
+        std::pair<int, int> bounds(args[i - 1].first.second + 1, args[i - 1].first.second + 1 + offset);
+        args.push_back(std::make_pair(bounds, this));
+    }
+
+    {
+        std::pair<int, int> bounds(args[THREADS - 2].first.second + 1, TOTAL_NODES_WITH_OUT);
+        args.push_back(std::make_pair(bounds, this));
+    }
 
     //Threads get started here!
     DWORD   dwThreadIdArray[THREADS];
@@ -335,26 +350,4 @@ void Graph::execute_last()
     }
 
     top.write();
-}
-
-std::vector<std::pair<std::pair<int, int>, Graph*>> Graph::create_args(uint32 offset)
-{
-    std::vector<std::pair < std::pair<int, int>, Graph* >> args;
-    {
-        std::pair<int, int> bounds(0, offset);
-        args.push_back(std::make_pair(bounds, this));
-    }
-
-    for (int i = 1; i < THREADS - 1; ++i)
-    {
-        std::pair<int, int> bounds(args[i - 1].first.second + 1, args[i - 1].first.second + 1 + offset);
-        args.push_back(std::make_pair(bounds, this));
-    }
-
-    {
-        std::pair<int, int> bounds(args[THREADS - 2].first.second + 1, TOTAL_NODES_WITH_OUT);
-        args.push_back(std::make_pair(bounds, this));
-    }
-
-    return args;
 }
