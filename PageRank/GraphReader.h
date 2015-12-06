@@ -28,7 +28,7 @@ public:
         this->end = this->buffer_start;
         this->FR = NULL;
     }
-    
+
     inline ~GraphReader()
     {
         delete this->FR;
@@ -39,7 +39,7 @@ public:
     {
         return this->FR->has_next() ? true : this->start < this->end;
     }
-    
+
     inline uint32 next_node(const HANDLE* gGraph_EMPTY, CONDITION_VARIABLE* GRAPH_LOADED, CRITICAL_SECTION* GRAPH_LOCK, GraphReader* graph)
     {
         if (this->start == this->end)
@@ -67,7 +67,7 @@ public:
 
         return currentHash;
     }
-    
+
     inline void load()
     {
         uint32 bytesTransferred = 0;
@@ -81,15 +81,15 @@ public:
 
     inline void init(char* file_name, bool buffer)
     {
-        if (this->FR != NULL) 
+        if (this->FR != NULL)
         {
             delete this->FR;
         }
         this->FR = new FileReader(file_name);
     }
 
-    inline void reset() 
-    { 
-        this->FR->offset_overall = 0; 
+    inline void reset()
+    {
+        this->FR->offset_overall = 0;
     }
 };

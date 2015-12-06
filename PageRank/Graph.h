@@ -22,24 +22,14 @@ public:
     uint64 total_read;
     uint64 total_write;
 
-    inline Graph(GraphReader* graph, PiManager* pi)
-    {
-        this->total_read = 0;
-        this->total_write = 0;
-
-        this->graph = graph;
-        this->pi = pi;
-
-        InitializeCriticalSection(&GRAPH_LOCK);
-        InitializeConditionVariable(&GRAPH_LOADED);
-    }
-
-    ~Graph() {};
+    Graph(GraphReader* graph, PiManager* pi);
+    Graph();
+    ~Graph();
 
     char* execute_first();
     void execute_iteration(uint32 num);
     void execute_last();
+    std::vector<std::pair < std::pair<int, int>, Graph* >> create_args(uint32 offset);
 private:
     HANDLE  hThreadArray[THREADS];
 };
-

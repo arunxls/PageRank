@@ -9,7 +9,7 @@
 #include "Graph.h"
 
 //no except
-void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
+void __cdecl _tmain(int argc, TCHAR *argv[])
 {
     if (argc != 2)
     {
@@ -33,8 +33,10 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
         reader.init(argv[1], false);
         Graph graph(&reader, &pi);
 
-        char* truncated_graph = graph.execute_first();
+        //char* truncated_graph = graph.execute_first();
         
+        char* truncated_graph = "PLD-truncated-graph.dat";
+
         reader.init(truncated_graph, true);
         graph.execute_iteration(9);
         
