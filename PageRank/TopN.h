@@ -38,6 +38,7 @@ public:
     {
         FileWriter FW("output.txt");
         FW.write(this->buffer_start, this->start - this->buffer_start);
+        this->total_write += this->start - this->buffer_start;
     }
     
     inline void put(uint32 index, uint32 hash, float value)

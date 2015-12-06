@@ -6,7 +6,6 @@
 #define _1_MB 1000000
 #define _1_GB 1000000000
 #define DEBUG 0
-#define READER_THREADS 4
 
 #define BUFFERSIZE 496
 #define TOTAL_NODES 86534418
@@ -15,6 +14,7 @@
 #define GRAPH_WRITER_SIZE 32
 #define ALPHA 0.85
 #define TOPN 1000
+#define THREADS 2
 
 typedef unsigned __int64 uint64;
 typedef unsigned __int32 uint32;

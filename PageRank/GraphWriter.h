@@ -46,6 +46,7 @@ public:
         *this->truncatedPointer = this->truncatedCounter;
 
         this->FW->write(this->buffer_start, (char*) this->start - this->buffer_start);
+        this->total_write += (char*) this->start - this->buffer_start;
 
         this->start = (uint32*) this->buffer_start;
     }

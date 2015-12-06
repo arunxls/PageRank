@@ -7,7 +7,7 @@
 #include <deque>
 #include <queue>
 
-typedef std::pair<double, uint32> pt;
+typedef std::pair<float, uint32> pt;
 struct comparator {
     bool operator()(pt& a, pt& b) {
         return a.first > b.first;
@@ -77,7 +77,7 @@ char * Graph::execute_first()
     truncated_file = "PLD-truncated-graph.dat";
     GraphWriter writer(truncated_file);
 
-    float offset = 1.0 / TOTAL_NODES;
+    double offset = 1.0 / TOTAL_NODES;
     while (this->graph->has_next())
     {
         uint32 currentHash = this->graph->next_node();
@@ -101,8 +101,8 @@ char * Graph::execute_first()
     double X = offset * TOTAL_NODES_WITH_OUT;
     double Y = 1.0 - X;
 
-    X *= (1.0 - ALPHA) / (float)TOTAL_NODES;
-    Y *= 1.0 / (float)TOTAL_NODES;
+    X *= (1.0 - ALPHA) / (double)TOTAL_NODES;
+    Y *= 1.0 / (double)TOTAL_NODES;
 
     for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
     {
@@ -117,6 +117,8 @@ char * Graph::execute_first()
     std::chrono::high_resolution_clock::time_point e1 = std::chrono::high_resolution_clock::now();
     int time = std::chrono::duration_cast<std::chrono::seconds>(e1 - b1).count();
     printf("Done iteration 1 in %lld seconds. Estimated time left: %lld seconds\n", time, time * 9);
+
+    this->total_write += writer.total_write;
 
     return writer.FW->filename;
 }
@@ -206,36 +208,6 @@ void Graph::execute_iteration(uint32 num)
     for (int i = 0; i < THREADS; ++i) {
         CloseHandle(this->hThreadArray[i]);
     }
-
-    std::priority_queue<std::pair<double, uint32>, std::vector<std::pair<double, uint32>>, comparator> queue;
-    for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
-    {
-        std::pair<double, uint32>p(this->pi->way[this->pi->current][i], i);
-        if (queue.size() == TOPN) {
-            std::pair<double, uint32>tmp = queue.top();
-            if (tmp.first < p.first) {
-                queue.pop();
-                queue.emplace(p);
-            }
-        }
-        else {
-            queue.emplace(p);
-        }
-    }
-
-    TopN top = TopN();
-    std::deque<std::pair<float, uint32>> r_queue;
-    while (queue.size() > 0) {
-        r_queue.emplace_back(queue.top());
-        queue.pop();
-    }
-
-    int index = 0;
-    for (auto i = r_queue.rbegin(); i != r_queue.rend(); ++i) {
-        top.put(++index, (*i).second, (*i).first);
-    }
-
-    top.write();
 }
 
 //void Graph::execute_iteration(uint32 num) 
@@ -310,8 +282,8 @@ void Graph::execute_last()
 
     double Y = 1.0 - X;
 
-    X *= (1.0 - ALPHA) / (float)TOTAL_NODES;
-    Y *= 1.0 / (float)TOTAL_NODES;
+    X *= (1.0 - ALPHA) / (double)TOTAL_NODES;
+    Y *= 1.0 / (double)TOTAL_NODES;
     for (int i = 0; i < this->pi->size; ++i)
     {
         this->pi->way[this->pi->current][i] = (ALPHA * this->pi->way[this->pi->current][i]) + X + Y;
@@ -321,12 +293,12 @@ void Graph::execute_last()
     int time = std::chrono::duration_cast<std::chrono::seconds>(e1 - b1).count();
     printf("Done iteration 10 in %lld seconds.\n", time);
 
-    std::priority_queue<std::pair<double, uint32>, std::vector<std::pair<double, uint32>>, comparator> queue;
-    for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
+    std::priority_queue<std::pair<float, uint32>, std::vector<std::pair<float, uint32>>, comparator> queue;
+    for (int i = 0; i < TOTAL_NODES; ++i)
     {
-        std::pair<double, uint32>p(this->pi->way[this->pi->current][i], i);
+        std::pair<float, uint32>p(this->pi->way[this->pi->current][i], i);
         if (queue.size() == TOPN) {
-            std::pair<double, uint32>tmp = queue.top();
+            std::pair<float, uint32>tmp = queue.top();
             if (tmp.first < p.first) {
                 queue.pop();
                 queue.emplace(p);
@@ -350,4 +322,6 @@ void Graph::execute_last()
     }
 
     top.write();
+
+    this->total_write += top.total_write;
 }
