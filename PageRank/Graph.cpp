@@ -4,6 +4,17 @@
 #include "utils.h"
 #include <utility>
 #include <ppl.h>
+#include "TopN.h"
+#include <iostream>
+#include <deque>
+#include <queue>
+
+typedef std::pair<double, uint32> pt;
+struct comparator {
+    bool operator()(pt& a, pt& b) {
+        return a.first > b.first;
+    }
+};
 
 Graph::Graph()
 {
@@ -40,10 +51,10 @@ DWORD WINAPI threadSecond(LPVOID data)
     while (1) 
     {
         uint32 currentHash = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
-        //printf("%I32u\n", currentHash);
 
         uint32 currentLen = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
         uint32 count = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
+        //uint32 count = currentLen;
 
         while (--count != -1)
         {
@@ -58,15 +69,16 @@ DWORD WINAPI threadSecond(LPVOID data)
 
 char * Graph::execute_first()
 {
+    std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
+
     this->pi->reset();
     this->graph->reset();
 
     this->graph->load();
 
-    //GraphWriter writer(getNewOutputFile());
+    GraphWriter writer(getNewOutputFile());
 
     float offset = 1.0 / TOTAL_NODES;
-    
     while (this->graph->has_next())
     {
         uint32 currentHash = this->graph->next_node();
@@ -75,37 +87,39 @@ char * Graph::execute_first()
         uint32 currentLen = this->graph->next_node();
         uint32 count = currentLen;
 
-        //writer.writeHeader(currentHash, currentLen);
-
+        writer.writeHeader(currentHash, currentLen);
         while (--count != -1)
         {
             uint32 node = this->graph->next_node();
-            if (node <= TOTAL_NODES_WITH_OUT_DEGREE)
+            if (node < TOTAL_NODES_WITH_OUT)
             {
-                //writer.writeTruncated(node);
+                writer.writeTruncated(node);
                 this->pi->way[this->pi->current()][node] += (offset / currentLen);
             }
         }
     }
 
-    double X = offset * TOTAL_NODES_WITH_OUT_DEGREE;
+    double X = offset * TOTAL_NODES_WITH_OUT;
     double Y = 1.0 - X;
 
-    X *= (1.0 - ALPHA) / (float) this->pi->size;
-    Y *= 1.0 / (float) this->pi->size;
+    X *= (1.0 - ALPHA) / (float) TOTAL_NODES;
+    Y *= 1.0 / (float)TOTAL_NODES;
 
-    for (int i = 0; i < this->pi->size; ++i)
+    for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
     {
         this->pi->way[this->pi->current()][i] = (ALPHA * this->pi->way[this->pi->current()][i]) + X + Y;
     }
-    
-    this->pi->print();
-    
 
-    //writer.writeToDisk();
+    //this->pi->getTopN();
+    //this->pi->print();
 
-    //return writer.FW->filename;
-    return new char[1];
+    writer.writeToDisk();
+
+    std::chrono::high_resolution_clock::time_point e1 = std::chrono::high_resolution_clock::now();
+    int time = std::chrono::duration_cast<std::chrono::seconds>(e1 - b1).count();
+    printf("Done iteration 1 in %lld seconds. Estimated time left: %lld seconds\n",time, time * 9);
+
+    return writer.FW->filename;
 }
 
 void Graph::execute_iteration(uint32 num)
@@ -113,7 +127,7 @@ void Graph::execute_iteration(uint32 num)
     this->graph->reset();
 
     //Create args
-    uint32 offset = TOTAL_NODES_WITH_OUT_DEGREE / THREADS;
+    uint32 offset = TOTAL_NODES_WITH_OUT / THREADS;
     std::vector<std::pair < std::pair<int, int>, Graph* >> args = this->create_args(offset);
 
     //Threads get started here!
@@ -138,7 +152,9 @@ void Graph::execute_iteration(uint32 num)
 
     for (uint32 i = 0; i < num; ++i)
     {
+        std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
         //Re-init for each iteration.
+        this->pi->invert();
         this->pi->reset();
         this->graph->reset();
 
@@ -162,20 +178,140 @@ void Graph::execute_iteration(uint32 num)
             WaitForSingleObject(gGraph_EMPTY, INFINITE);
         }
         
-        printf("%I32u iteration done!\n", i);
-        this->pi->invert();
+        this->pi->normalize();
+
+        //this->pi->getTopN();
+        //this->pi->print();
+
+        std::chrono::high_resolution_clock::time_point e1 = std::chrono::high_resolution_clock::now();
+        int time = std::chrono::duration_cast<std::chrono::seconds>(e1 - b1).count();
+        printf("Done iteration %d in %lld seconds. Estimated time left: %lld seconds\n", i+2, time, time * (num - i));
     }
 
     //Close threads here
     for (int i = 0; i < THREADS; ++i) {
         CloseHandle(this->hThreadArray[i]);
     }
-
-    printf("DONE!");
 }
+
+//void Graph::execute_iteration(uint32 num) 
+//{
+//    for (int i = 0; i < num; ++i) 
+//    {
+//        this->graph->reset();
+//        this->pi->invert();
+//        this->pi->reset();
+//        
+//        this->graph->load();
+//        while (this->graph->has_next())
+//        {
+//            uint32 currentHash = this->graph->next_node();
+//
+//            uint32 currentLen = this->graph->next_node();
+//            //uint32 count = this->graph->next_node();
+//            uint32 count = currentLen;
+//
+//            while (--count != -1)
+//            {
+//                uint32 node = this->graph->next_node();
+//                if (node < TOTAL_NODES_WITH_OUT)
+//                {
+//                    pi->way[pi->current()][node] += (pi->way[pi->prev()][currentHash] / currentLen);
+//                }
+//            }
+//        }
+//
+//        this->pi->normalize();
+//
+//        int array[] = { 24247151,13620962,21153020,22905655,13475170,17991418,1243757,14715032,960765,8269470,21025669 };
+//        for (int i = 0; i < 11; ++i) {
+//            printf("INDEX %d VALUE %f\n", array[i], this->pi->way[this->pi->current()][array[i]]);
+//        }
+//
+//        this->pi->print();
+//        printf("%I32u iteration done!\n", i + 2);
+//    }
+//}
 
 void Graph::execute_last()
 {
+    std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
+
+    this->pi->invert();
+    this->pi->resizeCurrent();
+    this->pi->reset();
+    
+    this->graph->reset();
+    this->graph->load();
+
+    while (this->graph->has_next())
+    {
+        uint32 currentHash = this->graph->next_node();
+
+        uint32 currentLen = this->graph->next_node();
+        uint32 count = currentLen;
+
+        while (--count != -1)
+        {
+            uint32 node = this->graph->next_node();
+            this->pi->way[this->pi->current()][node] += (pi->way[pi->prev()][currentHash] / currentLen);
+        }
+    }
+
+    double X = 0.0;
+    for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
+    {
+        X += this->pi->way[this->pi->prev()][i];
+    }
+
+    double Y = 1.0 - X;
+
+    X *= (1.0 - ALPHA) / (float)TOTAL_NODES;
+    Y *= 1.0 / (float)TOTAL_NODES;
+    for (int i = 0; i < this->pi->size; ++i)
+    {
+        this->pi->way[this->pi->current()][i] = (ALPHA * this->pi->way[this->pi->current()][i]) + X + Y;
+    }
+
+    std::chrono::high_resolution_clock::time_point e1 = std::chrono::high_resolution_clock::now();
+    int time = std::chrono::duration_cast<std::chrono::seconds>(e1 - b1).count();
+    printf("Done iteration 10 in %lld seconds.\n", time);
+
+    std::priority_queue<std::pair<double, uint32>, std::vector<std::pair<double, uint32>>, comparator> queue;
+    for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
+    {
+        std::pair<double, uint32>p(this->pi->way[this->pi->current()][i], i);
+        if (queue.size() == TOPN) {
+            std::pair<double, uint32>tmp = queue.top();
+            if (tmp.first < p.first) {
+                queue.pop();
+                queue.emplace(p);
+            }
+        }
+        else {
+            queue.emplace(p);
+        }
+    }
+
+    TopN top = TopN();
+    std::deque<std::pair<float, uint32>> r_queue;
+    while (queue.size() > 0) {
+        r_queue.emplace_back(queue.top());
+        queue.pop();
+    }
+
+    int index = 0;
+    for (auto i = r_queue.rbegin(); i != r_queue.rend(); ++i) {
+        top.put(++index, (*i).second, (*i).first);
+    }
+
+    //while (queue.size() > 0) {
+    //    std::pair<double, uint32> p = queue.top();
+    //    top.put(++index, p.second, p.first);
+    //    queue.pop();
+    //}
+
+    top.write();
 }
 
 std::vector<std::pair<std::pair<int, int>, Graph*>> Graph::create_args(uint32 offset)

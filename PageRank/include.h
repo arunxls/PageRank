@@ -8,10 +8,12 @@
 
 #define BUFFERSIZE 496
 #define TOTAL_NODES 86534418
-#define TOTAL_NODES_WITH_OUT_DEGREE 25943373
+#define TOTAL_NODES_WITH_OUT_DEGREE 86534418
+#define TOTAL_NODES_WITH_OUT 25943373
 #define GRAPH_READER_SIZE 32
 #define GRAPH_WRITER_SIZE 256
 #define ALPHA 0.85
+#define TOPN 1000
 
 typedef unsigned __int64 uint64;
 typedef unsigned __int32 uint32;

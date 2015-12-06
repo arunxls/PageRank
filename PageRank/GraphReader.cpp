@@ -11,6 +11,7 @@ GraphReader::GraphReader()
 
     this->start = this->buffer_start;
     this->end = this->buffer_start;
+    this->FR = NULL;
 }
 
 GraphReader::~GraphReader()
@@ -40,19 +41,6 @@ uint32 GraphReader::next_node(const HANDLE* gGraph_EMPTY, CONDITION_VARIABLE* GR
     return currentHash;
 }
 
-uint32 GraphReader::next_node()
-{
-    if (this->start == this->end)
-    {
-        this->load();
-    }
-
-    uint32 currentHash = *(uint32*)this->start;
-    this->start += sizeof(uint32);
-
-    return currentHash;
-}
-
 void GraphReader::load()
 {
     uint32 bytesTransferred = 0;
@@ -66,5 +54,8 @@ void GraphReader::load()
 
 void GraphReader::init(char * file_name, bool buffer)
 {
+    if (this->FR != NULL) {
+        delete this->FR;
+    }
     this->FR = new FileReader(file_name);
 }

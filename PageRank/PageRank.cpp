@@ -29,14 +29,19 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
 
     std::chrono::high_resolution_clock::time_point b1 = std::chrono::high_resolution_clock::now();
     {
-        PiManager pi(2, TOTAL_NODES_WITH_OUT_DEGREE);
+        PiManager pi(2, TOTAL_NODES_WITH_OUT);
         GraphReader reader;
-
+            
         reader.init(argv[1], false);
         Graph graph(&reader, &pi);
+
         char* truncated_graph = graph.execute_first();
+        
         reader.init(truncated_graph, true);
         graph.execute_iteration(8);
+        
+        reader.init(argv[1], false);
+        graph.execute_last();
         
         //printf("Total IO: read - %.2f GB; write - %.2f GB\n", (float)splitHash.total_read / _1_GB, (float)splitHash.total_write / _1_GB);
         //total_read += (float)splitHash.total_read;
@@ -44,7 +49,7 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
     }
     std::chrono::high_resolution_clock::time_point e1 = std::chrono::high_resolution_clock::now();
     printf("Took %lld seconds\n", std::chrono::duration_cast<std::chrono::seconds>(e1 - b1).count());
-    printf("Ending split phase\n");
+    printf("Ending pageRank\n");
 
     printf("\n");
 

@@ -14,12 +14,14 @@ public:
     PiManager(uint32 ways, uint32 size);
     ~PiManager();
 
-    int prev() { return state; }
-    int current() { return state ^ 1; }
+    int prev() { return this->state; }
+    int current() { return this->state ^ 1; }
 
     void invert() { this->state ^= 1; }
-    void reset() { memset(this->way[this->current()], 0.0, sizeof(float) * this->size); }
+    void reset();
     void print();
     void normalize();
+    void getTopN();
+    void resizeCurrent();
 };
 
