@@ -7,35 +7,12 @@
 #include <deque>
 #include <queue>
 
-typedef std::pair<double, uint32> pt;
+typedef std::pair<float, uint32> pt;
 struct comparator {
     bool operator()(pt& a, pt& b) {
         return a.first > b.first;
     }
 };
-
-Graph::Graph()
-{
-    this->total_read = 0;
-    this->total_write = 0;
-}
-
-
-Graph::Graph(GraphReader* graph, PiManager* pi)
-{
-    this->total_read = 0;
-    this->total_write = 0;
-
-    this->graph = graph;
-    this->pi = pi;
-
-    InitializeCriticalSection(&GRAPH_LOCK);
-    InitializeConditionVariable(&GRAPH_LOADED);
-}
-
-Graph::~Graph()
-{
-}
 
 DWORD WINAPI threadSecond(LPVOID data)
 {
@@ -127,7 +104,24 @@ void Graph::execute_iteration(uint32 num)
 
     //Create args
     uint32 offset = TOTAL_NODES_WITH_OUT / THREADS;
-    std::vector<std::pair < std::pair<int, int>, Graph* >> args = this->create_args(offset);
+
+    std::vector<std::pair < std::pair<int, int>, Graph* >> args;
+    {
+        std::pair<int, int> bounds(0, offset);
+        args.push_back(std::make_pair(bounds, this));
+    }
+
+    for (int i = 1; i < THREADS - 1; ++i)
+    {
+        std::pair<int, int> bounds(args[i - 1].first.second + 1, args[i - 1].first.second + 1 + offset);
+        args.push_back(std::make_pair(bounds, this));
+    }
+
+    {
+        std::pair<int, int> bounds(args[THREADS - 2].first.second + 1, TOTAL_NODES_WITH_OUT);
+        args.push_back(std::make_pair(bounds, this));
+    }
+
 
     //Threads get started here!
     DWORD   dwThreadIdArray[THREADS];
@@ -192,12 +186,12 @@ void Graph::execute_iteration(uint32 num)
         CloseHandle(this->hThreadArray[i]);
     }
 
-    std::priority_queue<std::pair<double, uint32>, std::vector<std::pair<double, uint32>>, comparator> queue;
+    std::priority_queue<std::pair<float, uint32>, std::vector<std::pair<float, uint32>>, comparator> queue;
     for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
     {
-        std::pair<double, uint32>p(this->pi->way[this->pi->current][i], i);
+        std::pair<float, uint32>p(this->pi->way[this->pi->current][i], i);
         if (queue.size() == TOPN) {
-            std::pair<double, uint32>tmp = queue.top();
+            std::pair<float, uint32>tmp = queue.top();
             if (tmp.first < p.first) {
                 queue.pop();
                 queue.emplace(p);
@@ -306,12 +300,12 @@ void Graph::execute_last()
     int time = std::chrono::duration_cast<std::chrono::seconds>(e1 - b1).count();
     printf("Done iteration 10 in %lld seconds.\n", time);
 
-    std::priority_queue<std::pair<double, uint32>, std::vector<std::pair<double, uint32>>, comparator> queue;
+    std::priority_queue<std::pair<float, uint32>, std::vector<std::pair<float, uint32>>, comparator> queue;
     for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
     {
-        std::pair<double, uint32>p(this->pi->way[this->pi->current][i], i);
+        std::pair<float, uint32>p(this->pi->way[this->pi->current][i], i);
         if (queue.size() == TOPN) {
-            std::pair<double, uint32>tmp = queue.top();
+            std::pair<float, uint32>tmp = queue.top();
             if (tmp.first < p.first) {
                 queue.pop();
                 queue.emplace(p);
@@ -335,26 +329,4 @@ void Graph::execute_last()
     }
 
     top.write();
-}
-
-std::vector<std::pair<std::pair<int, int>, Graph*>> Graph::create_args(uint32 offset)
-{
-    std::vector<std::pair < std::pair<int, int>, Graph* >> args;
-    {
-        std::pair<int, int> bounds(0, offset);
-        args.push_back(std::make_pair(bounds, this));
-    }
-
-    for (int i = 1; i < THREADS - 1; ++i)
-    {
-        std::pair<int, int> bounds(args[i - 1].first.second + 1, args[i - 1].first.second + 1 + offset);
-        args.push_back(std::make_pair(bounds, this));
-    }
-
-    {
-        std::pair<int, int> bounds(args[THREADS - 2].first.second + 1, TOTAL_NODES_WITH_OUT);
-        args.push_back(std::make_pair(bounds, this));
-    }
-
-    return args;
 }
