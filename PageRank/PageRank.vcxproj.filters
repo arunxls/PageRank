@@ -80,9 +80,6 @@
     <ClCompile Include="Graph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PiManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GraphWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

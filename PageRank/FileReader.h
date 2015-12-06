@@ -2,27 +2,78 @@
 
 #include <windows.h>
 #include "include.h"
-#include <string>
 
 class FileReader
 {
 public:
     char* filename;
     uint64 offset_overall;
-    uint32 offset_current_read;
     uint64 size;
 
     HANDLE hFile;
 
-    FileReader() {};
-    FileReader(char*& filename);
-    ~FileReader();
+    inline FileReader(char*& filename)
+    {
+        this->filename = filename;
+        this->offset_overall = 0;
+
+        this->getFileHandle();
+
+        LARGE_INTEGER size;
+        GetFileSizeEx(this->hFile, &size);
+        this->size = size.QuadPart;
+    }
+    
+    inline ~FileReader()
+    {
+        if (this->FileHandleOpen)
+        {
+            CloseHandle(this->hFile);
+        }
+    }
 
     void read(LPVOID buffer, uint32 bytesTotransfer, uint32& bytesTrasferred);
-    bool has_next();
-    LONGLONG getFileSize();
-    void getFileHandle();
-    void CloseFileHandle();
+    
+    inline bool has_next()
+    {
+        return this->offset_overall < this->size;
+    }
+    
+    inline void getFileHandle()
+    {
+        HANDLE hFile = CreateFile(this->filename,               // file to open
+            GENERIC_READ,          // open for reading
+            0,       // exclusive reading
+            NULL,                  // default security
+            OPEN_EXISTING,         // existing file only
+            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, // normal file
+            NULL);
+
+        if (hFile == INVALID_HANDLE_VALUE)
+        {
+            hFile = CreateFile(this->filename,               // file to open
+                GENERIC_READ,          // open for reading
+                FILE_SHARE_READ,       // share for reading
+                NULL,                  // default security
+                OPEN_EXISTING,         // existing file only
+                FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, // normal file
+                NULL);
+            if (hFile == INVALID_HANDLE_VALUE) {
+                _tprintf("Terminal failure: unable to open file \"%s\" for read.\n", this->filename);
+                std::abort();
+            }
+        }
+
+        this->FileHandleOpen = true;
+        this->hFile = hFile;
+    }
+    
+    inline void CloseFileHandle()
+    {
+        CloseHandle(this->hFile);
+        this->FileHandleOpen = false;
+    }
+
 private:
     bool FileHandleOpen;
 };

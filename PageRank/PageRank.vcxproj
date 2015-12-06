@@ -167,7 +167,6 @@
     <ClCompile Include="GraphReader.cpp" />
     <ClCompile Include="GraphWriter.cpp" />
     <ClCompile Include="PageRank.cpp" />
-    <ClCompile Include="PiManager.cpp" />
     <ClCompile Include="print.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

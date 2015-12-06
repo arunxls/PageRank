@@ -15,23 +15,7 @@ VOID CALLBACK FileIOCompletionRoutine(
     }
 }
 
-FileReader::FileReader(char*& filename)
-{
-    this->filename = filename;
-    this->offset_current_read = 0;
-    this->offset_overall = 0;
 
-    this->getFileHandle();
-    this->size = this->getFileSize();
-}
-
-FileReader::~FileReader()
-{
-    if (this->FileHandleOpen)
-    {
-        CloseHandle(this->hFile);
-    }
-}
 
 void FileReader::read(LPVOID buffer, uint32 bytesTotransfer, uint32& bytesTrasferred)
 {
@@ -57,53 +41,5 @@ void FileReader::read(LPVOID buffer, uint32 bytesTotransfer, uint32& bytesTrasfe
     SleepEx(5000, TRUE);
     bytesTrasferred = ol.InternalHigh;
 
-    this->offset_current_read = bytesTrasferred;
     this->offset_overall += bytesTrasferred;
-}
-
-bool FileReader::has_next()
-{
-    return this->offset_overall < this->size;
-}
-
-LONGLONG FileReader::getFileSize()
-{
-    LARGE_INTEGER size;
-    GetFileSizeEx(this->hFile, &size);
-    return size.QuadPart;
-}
-
-void FileReader::getFileHandle()
-{
-    HANDLE hFile = CreateFile(this->filename,               // file to open
-        GENERIC_READ,          // open for reading
-        0,       // exclusive reading
-        NULL,                  // default security
-        OPEN_EXISTING,         // existing file only
-        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, // normal file
-        NULL);
-
-    if (hFile == INVALID_HANDLE_VALUE)
-    {
-        hFile = CreateFile(this->filename,               // file to open
-            GENERIC_READ,          // open for reading
-            FILE_SHARE_READ,       // share for reading
-            NULL,                  // default security
-            OPEN_EXISTING,         // existing file only
-            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED | FILE_FLAG_NO_BUFFERING, // normal file
-            NULL);
-        if (hFile == INVALID_HANDLE_VALUE) {
-            _tprintf("Terminal failure: unable to open file \"%s\" for read.\n", this->filename);
-            std::abort();
-        }
-    }
-
-    this->FileHandleOpen = true;
-    this->hFile = hFile;
-}
-
-void FileReader::CloseFileHandle()
-{
-    CloseHandle(this->hFile);
-    this->FileHandleOpen = false;
 }
