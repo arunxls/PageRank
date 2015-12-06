@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include "include.h"
+#include <cstdlib>
 
 class FileReader
 {

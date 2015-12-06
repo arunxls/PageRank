@@ -1,6 +1,7 @@
 #pragma once
 
 #include <windows.h>
+#include <strsafe.h>
 
 #define _1_MB 1000000
 #define _1_GB 1000000000
@@ -20,27 +21,44 @@ typedef unsigned __int32 uint32;
 typedef __int32 int32;
 typedef unsigned short   ushort;
 
-#pragma pack(push,1) // change struct packing to 1 byte
-class HeaderGraph {
-public:
-    uint32 hash;
-    uint32 len;
+static void DisplayError(LPTSTR lpszFunction)
+// Routine Description:
+// Retrieve and output the system error message for the last-error code
+{
+    LPVOID lpMsgBuf;
+    LPVOID lpDisplayBuf;
+    DWORD dw = GetLastError();
 
-    uint32 size()
+    FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        dw,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR)&lpMsgBuf,
+        0,
+        NULL);
+
+    lpDisplayBuf =
+        (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+            (lstrlen((LPCTSTR)lpMsgBuf)
+                + lstrlen((LPCTSTR)lpszFunction)
+                + 40) // account for format string
+            * sizeof(TCHAR));
+
+    if (FAILED(StringCchPrintf((LPTSTR)lpDisplayBuf,
+        LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+        TEXT("%s failed with error code %d as follows:\n%s"),
+        lpszFunction,
+        dw,
+        lpMsgBuf)))
     {
-        return sizeof(HeaderGraph) + (sizeof(uint32)*this->len);
+        printf("FATAL ERROR: Unable to output error code.\n");
     }
-};
 
-class TruncatedHeaderGraph {
-public:
-    uint32 hash;
-    uint32 original_len;
-    uint32 current_len;
+    _tprintf(TEXT("ERROR: %s\n"), (LPCTSTR)lpDisplayBuf);
 
-    uint32 size()
-    {
-        return sizeof(TruncatedHeaderGraph) + (sizeof(uint32)*this->current_len);
-    }
-};
-#pragma pack(pop)
+    LocalFree(lpMsgBuf);
+    LocalFree(lpDisplayBuf);
+}

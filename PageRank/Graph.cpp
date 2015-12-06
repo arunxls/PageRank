@@ -1,11 +1,9 @@
 #include "stdafx.h"
 #include "Graph.h"
 #include "GraphWriter.h"
-#include "utils.h"
 #include <utility>
 #include <ppl.h>
 #include "TopN.h"
-#include <iostream>
 #include <deque>
 #include <queue>
 
@@ -75,7 +73,9 @@ char * Graph::execute_first()
 
     //this->graph->load();
 
-    GraphWriter writer(getNewOutputFile());
+    char* truncated_file = new char[24];
+    truncated_file = "PLD-truncated-graph.dat";
+    GraphWriter writer(truncated_file);
 
     float offset = 1.0 / TOTAL_NODES;
     while (this->graph->has_next())

@@ -21,8 +21,6 @@ void __cdecl _tmain(int argc, TCHAR *argv[]) noexcept
     uint64 total_read = 0;
     uint64 total_write = 0;
 
-    uint32 buffer_size = BUFFERSIZE * _1_MB;
-
     clock_t begin, end;
 
     printf("Starting pageRank\n");

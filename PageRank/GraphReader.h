@@ -34,5 +34,5 @@ public:
     }
     void load();
     void init(char* file_name, bool buffer);
-    void reset() { this->FR->offset_current_read = 0; this->FR->offset_overall = 0; }
+    void reset() { this->FR->offset_overall = 0; }
 };

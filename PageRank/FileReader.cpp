@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "FileReader.h"
-#include "utils.h"
-#include <algorithm>
 
 VOID CALLBACK FileIOCompletionRoutine(
     __in  DWORD dwErrorCode,
@@ -14,8 +12,6 @@ VOID CALLBACK FileIOCompletionRoutine(
         _tprintf(TEXT("Number of bytes:\t%I32u\n"), dwNumberOfBytesTransfered);
     }
 }
-
-
 
 void FileReader::read(LPVOID buffer, uint32 bytesTotransfer, uint32& bytesTrasferred)
 {
