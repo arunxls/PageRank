@@ -85,22 +85,31 @@
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>
+      </Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <InlineFunctionExpansion>
+      </InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <WholeProgramOptimization>
+      </WholeProgramOptimization>
       <BasicRuntimeChecks>
       </BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <RuntimeLibrary>
+      </RuntimeLibrary>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <EnableParallelCodeGeneration>
+      </EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>
       </EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IntrinsicFunctions>
+      </IntrinsicFunctions>
       <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalOptions>/ResetSettings %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,22 +121,31 @@
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>
+      </Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <InlineFunctionExpansion>
+      </InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <WholeProgramOptimization>
+      </WholeProgramOptimization>
       <BasicRuntimeChecks>
       </BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <RuntimeLibrary>
+      </RuntimeLibrary>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <EnableParallelCodeGeneration>
+      </EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>
       </EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <IntrinsicFunctions>
+      </IntrinsicFunctions>
       <ExceptionHandling>false</ExceptionHandling>
+      <AdditionalOptions>/ResetSettings %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,21 +157,30 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <Optimization>MaxSpeed</Optimization>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <Optimization>
+      </Optimization>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <IntrinsicFunctions>
+      </IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
+      <InlineFunctionExpansion>
+      </InlineFunctionExpansion>
+      <RuntimeLibrary>
+      </RuntimeLibrary>
+      <BufferSecurityCheck>
+      </BufferSecurityCheck>
+      <EnableParallelCodeGeneration>
+      </EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>
       </EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ExceptionHandling>false</ExceptionHandling>
       <BasicRuntimeChecks />
+      <WholeProgramOptimization />
+      <AdditionalOptions>/ResetSettings %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,17 +198,22 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>true</OmitFramePointers>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
-      <EnableEnhancedInstructionSet>
-      </EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <ExceptionHandling>false</ExceptionHandling>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <RuntimeLibrary>
+      </RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <EnableParallelCodeGeneration>
+      </EnableParallelCodeGeneration>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks />
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalOptions>/ResetSettings %(AdditionalOptions)</AdditionalOptions>
+      <TreatSpecificWarningsAsErrors>
+      </TreatSpecificWarningsAsErrors>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

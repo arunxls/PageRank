@@ -40,12 +40,13 @@ public:
         return this->FR->has_next() ? true : this->start < this->end;
     }
     
-    inline uint32 next_node(const HANDLE* gGraph_EMPTY, CONDITION_VARIABLE* GRAPH_LOADED, CRITICAL_SECTION* GRAPH_LOCK, GraphReader* graph)
+    inline uint32 next_node(const HANDLE* gGraph_EMPTY, const HANDLE* gGraph_STARTED, CONDITION_VARIABLE* GRAPH_LOADED, CRITICAL_SECTION* GRAPH_LOCK, GraphReader* graph)
     {
         if (this->start == this->end)
         {
             ReleaseSemaphore(*gGraph_EMPTY, 1, NULL);
-            SleepConditionVariableCS(GRAPH_LOADED, GRAPH_LOCK, INFINITE);
+            WaitForSingleObject(*gGraph_STARTED, INFINITE);
+            //SleepConditionVariableCS(GRAPH_LOADED, GRAPH_LOCK, INFINITE);
             this->start = graph->start;
             this->end = graph->end;
         }

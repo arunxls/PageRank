@@ -48,15 +48,16 @@ DWORD WINAPI threadSecond(LPVOID data)
 
     while (1)
     {
-        uint32 currentHash = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
+        uint32 currentHash = graph.next_node(&gGraph_EMPTY, &gGraph_STARTED, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
 
-        uint32 currentLen = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
-        uint32 count = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
-        //uint32 count = currentLen;
+        uint32 currentLen = graph.next_node(&gGraph_EMPTY, &gGraph_STARTED, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
+
+        uint32 count = graph.next_node(&gGraph_EMPTY, &gGraph_STARTED, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
 
         while (--count != -1)
         {
-            uint32 node = graph.next_node(&gGraph_EMPTY, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
+            uint32 node = graph.next_node(&gGraph_EMPTY, &gGraph_STARTED, &GRAPH_LOADED, &GRAPH_LOCK, arg.second->graph);
+            
             if (node >= lower && node <= upper)
             {
                 pi->way[pi->current][node] += (pi->way[pi->prev][currentHash] / currentLen);
@@ -176,7 +177,7 @@ void Graph::execute_iteration(uint32 num)
 
         //Start each iteration here
         this->graph->load();
-        WakeAllConditionVariable(&GRAPH_LOADED);
+        ReleaseSemaphore(gGraph_STARTED, THREADS, NULL);
 
         while (this->graph->FR->has_next())
         {
@@ -186,7 +187,7 @@ void Graph::execute_iteration(uint32 num)
             }
 
             this->graph->load();
-            WakeAllConditionVariable(&GRAPH_LOADED);
+            ReleaseSemaphore(gGraph_STARTED, THREADS, NULL);
         }
 
         for (int i = 0; i < THREADS; ++i)
@@ -206,6 +207,7 @@ void Graph::execute_iteration(uint32 num)
 
     //Close threads here
     for (int i = 0; i < THREADS; ++i) {
+        TerminateThread(this->hThreadArray[i], 1);
         CloseHandle(this->hThreadArray[i]);
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include.h"
+#include <iostream>
 
 class PiManager
 {
@@ -71,8 +72,8 @@ public:
 
         Y = 1.0 - X;
 
-        X *= (1.0 - ALPHA) / (float)TOTAL_NODES;
-        Y *= 1.0 / (float)TOTAL_NODES;
+        X *= ((1.0 - ALPHA) / (float)TOTAL_NODES);
+        Y *= (1.0 / (float)TOTAL_NODES);
 
         for (int i = 0; i < TOTAL_NODES_WITH_OUT; ++i)
         {
